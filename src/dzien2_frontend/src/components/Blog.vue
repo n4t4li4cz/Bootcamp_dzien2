@@ -1,21 +1,28 @@
 <template>
     <div>
-        <h2 class="text-color-600">Wpisy na bloga:</h2>
+        <h2 class="text-blue-600">Wpisy na bloga:</h2>
         <div class="w-100 flex flex-row-reverse">
-            <button @click="pobierzWpisy" class="float-right bg-blue-600 rounded text-white p-4">refresh</button>
+            <button @click="pobierzWpisy" class="bg-blue-600 rounded text-white p-4">refresh</button>
         </div>
-        <div class="grid mx-6 gap-4 my-4 p-4">
-        <div v-for="wpis in wpisy" class="drop-shadow-xl bg-stone-100">
-            <p>{{wpis}}</p>
+        <div class="grid mx-6 gap-4 my-4">
+            <div v-for="(wpis, index) in wpisy" class="drop-shadow-xl bg-stone-300 p-4">
+                <p>id: {{ index }}</p>
+                <p>{{ wpis }}</p>
+                <br />
+                <button  class="bg-blue-600 rounded text-white p-4" @click="deleteWpis(index)">usun</button>
+                <br /><br />
+                <label for="name">Nowy wpis:</label>
+                <input type="text" id="name" v-model="nowywpis">
+                <button  class="bg-blue-600 rounded text-white p-4 my-10" @click="aktualizuj(index)">aktualizuj</button>
+                
+            </div>
         </div>
-        <div class="flex justifice-content flex-col">
-            <input v-model="nowyBlog" type="text" class="borer-2 border-blue-600 p-4">
-            <button @click="dodajWpisy" class="bg-blue-600 rounded text-white p-4">dodaj</button>
-
+        <div class="flex justify-center flex-col">
+            <input v-model="nowyBlog" class="border-2 border-blue-600 p-4" type="text">
+            <button  class="bg-blue-600 rounded text-white p-4" @click="dodajWpisy">dodaj</button>
         </div>
-        
     </div>
-</div>
+
 </template>
 
 <script>
@@ -31,13 +38,31 @@ export default {
     methods: {
         async dodajWpisy() {
             await dzien2_backend.dodaj_wpis(this.nowyBlog);
+            await this.pobierzWpisy();
+        },
+        async deleteWpis(index) {
+            await dzien2_backend.usun_wpis(index);
+            await this.pobierzWpisy();
         },
         async pobierzWpisy() {
             this.wpisy = await dzien2_backend.odczytaj_wpisy();
+        },
+        async aktualizujWpis(index, nowywpis) {
+            
+            
+            await dzien2_backend.edytuj_wpis(index, nowywpis);
+            await this.pobierzWpisy();
+        },
+        async aktualizuj(index)
+        {
+            
+            await dzien2_backend.edytuj_wpis(index, this.nowywpis);
+            await this.pobierzWpisy();
+            
         }
     },
     async mounted(){
-        this.pobierzWpisy();
+        this.pobierzWpisy()
     }
 }
 </script>
